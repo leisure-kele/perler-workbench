@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family:
+    "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, Segoe UI,
+    Roboto, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Canvas 渲染时像素点清晰 */
+canvas {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: pixelated;
+}

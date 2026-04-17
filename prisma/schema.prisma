@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Pattern {
+  id         String   @id @default(cuid())
+  title      String
+  width      Int
+  height     Int
+  cells      String   // JSON stringified number[][] —— 存 palette 索引
+  palette    String   // JSON stringified string[] —— 用到的 BeadColor id
+  beadCounts String   // JSON stringified Record<string, number>
+  sourceType String   // "upload" | "douyin" | "preset"
+  sourceUrl  String?
+  thumbnail  String?  // data URL 或相对路径
+  ownerId    String?  // anonymous_user_id；预置关卡为 null
+  isPublic   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  level      Level?
+  progress   UserProgress[]
+}
+
+model Level {
+  id         String  @id @default(cuid())
+  slug       String  @unique
+  title      String
+  difficulty Int
+  order      Int
+  videoUrl   String?
+  videoTitle String?
+  patternId  String  @unique
+  pattern    Pattern @relation(fields: [patternId], references: [id], onDelete: Cascade)
+}
+
+model UserProgress {
+  id             String   @id @default(cuid())
+  userId         String
+  patternId      String
+  completedCells String   // JSON stringified number[]
+  status         String   @default("in_progress") // "in_progress" | "completed"
+  updatedAt      DateTime @updatedAt
+  pattern        Pattern  @relation(fields: [patternId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, patternId])
+}
+
+model Job {
+  id        String   @id @default(cuid())
+  status    String   @default("pending") // pending | extracting | recognizing | quantizing | done | failed
+  step      String?
+  progress  Int      @default(0)
+  patternId String?
+  error     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
